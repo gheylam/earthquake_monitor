@@ -178,10 +178,12 @@ plt.show()
 fig_cartesian = plt.figure()
 ax2 = fig_cartesian.add_subplot(111)
 ax2.scatter(pt_x, pt_y, s=0.5, c=pt_colors, cmap="gray_r")
-ax2.scatter(station_x, station_y, s=100, c=station_colors, cmap='hsv')
-ax2.scatter(true_sensor_reading_x, true_sensor_reading_y, c=true_sensor_reading_color, s=1, cmap="hsv")
-ax2.scatter(noisy_sensor_reading_x, noisy_sensor_reading_y, c=noisy_sensor_reading_color, s=1, cmap="viridis")
-plt.plot(ground_truth_x, ground_truth_y, 'r+', mew=2, ms=10)
+ax2.scatter(station_x, station_y, s=100, c='tab:green', cmap='hsv', alpha=0.5, label='Station')
+#ax2.scatter(true_sensor_reading_x, true_sensor_reading_y, c=true_sensor_reading_color, s=1, cmap="hsv", label="True signal")
+ax2.scatter(true_sensor_reading_x, true_sensor_reading_y, c='tab:blue', s=10, cmap="hsv", label="True signal")
+#ax2.scatter(noisy_sensor_reading_x, noisy_sensor_reading_y, c=noisy_sensor_reading_color, s=1, cmap="viridis", label="Noisy signal")
+ax2.scatter(noisy_sensor_reading_x, noisy_sensor_reading_y, c='tab:orange', s=10, cmap="viridis", label="Noisy signal")
+plt.plot(ground_truth_x, ground_truth_y, 'r+', mew=2, ms=10, label='Ground Truth')
 station_circle = plt.Circle((0, 0), 1.0, color='black', fill=False)
 ax2.add_artist(station_circle)
 
@@ -190,7 +192,8 @@ max_posterior = np.amax(pt_colors)
 max_index = np.where(pt_colors == max_posterior)
 max_x = pt_x[max_index]
 max_y = pt_y[max_index]
-plt.plot(max_x, max_y, 'b+', mew=2, ms=10)
+plt.plot(max_x, max_y, 'b+', mew=2, ms=10, label='Max Posterior')
+ax2.legend()
 
 plt.show()
 
