@@ -20,7 +20,10 @@ def single_explosion_signal_noisy(station_x, station_y, truth_x, truth_y, sd):
 
 def calculate_location_posterior(pts_x, pts_y, noisy_station_signal, station_x, station_y, sd):
     pts_dim = pts_x.shape[0]
-    posterior_xy = np.ones(pts_dim)
+    # Start with uniform prior (as specified in question)
+    prior_xy = np.ones(pts_dim)
+    # Initialise posterior with zeros
+    posterior_xy = np.zeros(pts_dim)
 
     # For every point we assign the posterior probability value
     for pt in range(pts_dim):
@@ -38,7 +41,9 @@ def calculate_location_posterior(pts_x, pts_y, noisy_station_signal, station_x, 
             exp_coffe = -1 / (2 * sd**2)
             sqr_diff = (noisy_station_signal[station] - expected_signal)**2
             prob_of_sig_z_given_d = normal_coffe * np.exp(exp_coffe * sqr_diff)
-            posterior_xy[pt] = posterior_xy[pt] * prob_of_sig_z_given_d
+            # Bayesian Updating:
+            # Posterior = Prior * Likelihood
+            posterior_xy[pt] = prior_xy[pt] * prob_of_sig_z_given_d
 
     return posterior_xy
 
