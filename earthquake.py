@@ -8,19 +8,29 @@ def value_cal(xs, ys, x_sensor_values, y_sensor_values):
     print(y_sensor_values.shape())
     return 1
 
+# From BRML Example 1.12
 def single_explosion_signal_truth(station_x, station_y, truth_x, truth_y):
+    # The signal received at each sensor is is given by 1 / (di^2 + 0.1)
+    # Where di^2 = (xi - ex)^2 + (yi - ey)^2
     distance_sqr = (station_x - truth_x)**2 + (station_y - truth_y)**2
     signal = 1 / (distance_sqr + 0.1)
     return signal
 
+# Sensors imperfect, thus measured with Gaussian noise of sd
 def single_explosion_signal_noisy(station_x, station_y, truth_x, truth_y, sd):
+    # Calculate true (noiseless) signal for given station & explosion
     truth = single_explosion_signal_truth(station_x, station_y, truth_x, truth_y)
+    # Gaussian noise: drawn from a zero-mean unit variance, sd
     noise = np.random.normal(0, sd)
+    # Combine true (noiseless) signal + noise
     return truth + noise
 
 def calculate_location_posterior(pts_x, pts_y, noisy_station_signal, station_x, station_y, sd):
     pts_dim = pts_x.shape[0]
-    posterior_xy = np.ones(pts_dim)
+    # Start with uniform prior (as specified in question)
+    prior_xy = np.ones(pts_dim)
+    # Initialise posterior with zeros
+    posterior_xy = np.zeros(pts_dim)
 
     # For every point we assign the posterior probability value
     for pt in range(pts_dim):
@@ -33,14 +43,20 @@ def calculate_location_posterior(pts_x, pts_y, noisy_station_signal, station_x, 
         for station in range(num_stations):
             # Get the expected signal
             expected_signal = single_explosion_signal_truth(station_x[station], station_y[station], x, y)
-            # P(V = z | D = d)
+            # P(Vi = z | Di = d)
+            # Observed value V, at sensor i, follows a Gaussian distribution:
+            # Equation from BRML Example 1.12
             normal_coffe = 1 / np.sqrt(2 * np.pi * sd**2)
             exp_coffe = -1 / (2 * sd**2)
             sqr_diff = (noisy_station_signal[station] - expected_signal)**2
             prob_of_sig_z_given_d = normal_coffe * np.exp(exp_coffe * sqr_diff)
-            posterior_xy[pt] = posterior_xy[pt] * prob_of_sig_z_given_d
+            
+            # Bayesian Updating:
+            # Posterior = Prior * Likelihood
+            posterior_xy[pt] = prior_xy[pt] * prob_of_sig_z_given_d
 
     return posterior_xy
+
 
 
 # plotting the basic graph
